@@ -3,7 +3,7 @@ Simple session container implementation for ASP .NET Core
 
 ### Configuring project
 
-Firstly, need to add register few services in ```Program.cs```
+Firstly, need to register few services in ```Program.cs```
 
 ```csharp
 builder.Services.AddSession();
