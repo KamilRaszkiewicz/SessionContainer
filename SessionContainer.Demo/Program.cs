@@ -22,12 +22,12 @@ namespace SessionContainer.Demo
                 if (container.Numbers == null)
                 {
                     container.Numbers = new List<int>() { 1 };
-                    container.Save();
-
-                    return container.Numbers;
+                }
+                else
+                {
+                    container.Numbers.Add(container.Numbers.Last() + 1);
                 }
 
-                container.Numbers.Add(container.Numbers.Last() + 1);
                 container.Save();
 
                 return container.Numbers;
