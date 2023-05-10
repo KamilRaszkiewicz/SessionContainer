@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -9,21 +11,18 @@ namespace SessionContainer
 {
     public abstract class SessionContainer
     {
-        private readonly Type _type;
-        private readonly PropertyInfo[] _properties;
-        private readonly string _sessionKeyPrefix;
+        private Type _type;
+        private PropertyInfo[] _properties;
+        private string _sessionKeyPrefix;
 
         private readonly ISession _session;
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
-
+        private static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles };
+        protected static IReadOnlyDictionary<string, (Type Type, PropertyInfo[] Properties, string SessionKeyPrefix)> InfoDictionary;
         public SessionContainer(IHttpContextAccessor httpContextAccessor)
         {
             _session = httpContextAccessor.HttpContext.Session;
-            _jsonSerializerOptions = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles };
 
-            _type = this.GetType();
-            _properties = _type.GetProperties();
-            _sessionKeyPrefix = _type.Name;
+            (_type, _properties, _sessionKeyPrefix) = InfoDictionary[GetType().Name];
 
             foreach (var property in _properties)
             {
@@ -32,6 +31,26 @@ namespace SessionContainer
                 property.SetValue(this, value);
             }
 
+        }
+
+        static SessionContainer()
+        {
+            var types = typeof(SessionContainer).Assembly
+                .GetReferencingAssemblies()
+                .SelectMany(a => a.DefinedTypes)
+                .Where(t =>
+                    t.IsAssignableTo(typeof(SessionContainer)) &&
+                    !t.IsAbstract &&
+                    !t.IsInterface);
+
+            var dictionary = new Dictionary<string, (Type Type, PropertyInfo[] Properties, string SessionKeyPrefix)>();
+
+            foreach(var type in types)
+            {
+                dictionary.Add(type.Name, (type.GetType(), type.GetProperties(), type.Name));
+            }
+
+            InfoDictionary = dictionary.AsReadOnly();
         }
 
         private string GetSessionKey(PropertyInfo property)

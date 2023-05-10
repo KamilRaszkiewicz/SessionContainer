@@ -12,7 +12,7 @@ namespace SessionContainer.Demo
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddDistributedMemoryCache();
 
-            builder.Services.AddSessionMappings(Assembly.GetExecutingAssembly());
+            builder.Services.AddSessionMappings();
 
             var app = builder.Build();
             app.UseSession();

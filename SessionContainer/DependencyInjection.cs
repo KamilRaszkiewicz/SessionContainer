@@ -10,17 +10,19 @@ namespace SessionContainer
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddSessionMappings(this IServiceCollection services, Assembly assembly)
+        public static IServiceCollection AddSessionMappings(this IServiceCollection services)
         {
-            var types = assembly.DefinedTypes
+            var types = typeof(SessionContainer).Assembly
+                .GetReferencingAssemblies()
+                .SelectMany(a => a.DefinedTypes)
                 .Where(t =>
-                t.IsAssignableTo(typeof(SessionContainer)) &&
-                !t.IsAbstract &&
-                !t.IsInterface);
+                    t.IsAssignableTo(typeof(SessionContainer)) &&
+                    !t.IsAbstract &&
+                    !t.IsInterface);
 
             foreach (var type in types)
             {
-                services.AddTransient(type);
+                services.AddScoped(type);
             }
 
             return services;
