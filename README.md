@@ -10,7 +10,7 @@ builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 
-builder.Services.AddSessionMappings(Assembly.GetExecutingAssembly()); 
+builder.Services.AddSessionMappings(); 
 
 var app = builder.Build();
 app.UseSession();
@@ -31,7 +31,7 @@ public class NumbersContainer : SessionContainer
 }
 ```
 
-Class ```NumbersContainer``` will be automatically registered as transient, now application is ready to use it as service.
+Class ```NumbersContainer``` will be automatically registered as scoped, now application is ready to use ```NumbersContainer``` as service.
 Object state is set up based on session contents on constructing object.
 ```Save()``` method saves the current state of the object to session.
 
