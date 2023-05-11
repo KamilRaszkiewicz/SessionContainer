@@ -11,18 +11,18 @@ namespace SessionContainer
 {
     public abstract class SessionContainer
     {
-        private Type _type;
         private PropertyInfo[] _properties;
         private string _sessionKeyPrefix;
 
         private readonly ISession _session;
-        private static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles };
-        protected static IReadOnlyDictionary<string, (Type Type, PropertyInfo[] Properties, string SessionKeyPrefix)> InfoDictionary;
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles };
+        protected static readonly IReadOnlyDictionary<string, (PropertyInfo[] Properties, string SessionKeyPrefix)> InfoDictionary;
+
         public SessionContainer(IHttpContextAccessor httpContextAccessor)
         {
             _session = httpContextAccessor.HttpContext.Session;
 
-            (_type, _properties, _sessionKeyPrefix) = InfoDictionary[GetType().Name];
+            (_properties, _sessionKeyPrefix) = InfoDictionary[GetType().Name];
 
             foreach (var property in _properties)
             {
@@ -43,11 +43,11 @@ namespace SessionContainer
                     !t.IsAbstract &&
                     !t.IsInterface);
 
-            var dictionary = new Dictionary<string, (Type Type, PropertyInfo[] Properties, string SessionKeyPrefix)>();
+            var dictionary = new Dictionary<string, (PropertyInfo[] Properties, string SessionKeyPrefix)>();
 
             foreach(var type in types)
             {
-                dictionary.Add(type.Name, (type.GetType(), type.GetProperties(), type.Name));
+                dictionary.Add(type.Name, ( type.GetProperties(), type.Name));
             }
 
             InfoDictionary = dictionary.AsReadOnly();
