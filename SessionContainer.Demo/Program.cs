@@ -19,14 +19,7 @@ namespace SessionContainer.Demo
 
             app.MapGet("/", (NumbersContainer container) =>
             {
-                if (container.Numbers == null)
-                {
-                    container.Numbers = new List<int>() { 1 };
-                }
-                else
-                {
-                    container.Numbers.Add(container.Numbers.Last() + 1);
-                }
+                container.Numbers.Add(container.Numbers.LastOrDefault() + 1);
 
                 container.Save();
 

@@ -24,6 +24,14 @@ namespace SessionContainer
 
             (_properties, _sessionKeyPrefix) = InfoDictionary[GetType().Name];
 
+            if (!IsSessionInitialized())
+            {
+                _session.Set(_sessionKeyPrefix, new byte[] { 1 });
+                Save();
+
+                return;
+            }
+
             foreach (var property in _properties)
             {
                 var value = GetPropertyValueFromSession(property);
@@ -66,6 +74,13 @@ namespace SessionContainer
             if (string.IsNullOrEmpty(json)) return default;
 
             return JsonSerializer.Deserialize(json, property.PropertyType, _jsonSerializerOptions);
+        }
+
+        private bool IsSessionInitialized()
+        {
+            var value = _session.Get(_sessionKeyPrefix);
+
+            return value != null;
         }
 
         public void Save()
