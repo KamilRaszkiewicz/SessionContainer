@@ -23,7 +23,7 @@ Declare class that derives from ```SessionContainer``` with some property, for e
 ```csharp
 public class NumbersContainer : SessionContainer
 {
-    public List<int> Numbers { get; set; }
+    public List<int> Numbers { get; set; } = new List<int>() { };
 
     public NumbersContainer(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
@@ -38,17 +38,10 @@ Object state is set up based on session contents on constructing object.
 ```csharp
 app.MapGet("/", (NumbersContainer container) =>
 {
-    if (container.Numbers == null)
-    {
-        container.Numbers = new List<int>() { 1 };
-    }
-    else
-    {
-        container.Numbers.Add(container.Numbers.Last() + 1);
-    }
-    
+    container.Numbers.Add(container.Numbers.LastOrDefault() + 1);
+
     container.Save();
-    
+
     return container.Numbers;
 });
 ```
