@@ -10,13 +10,15 @@ namespace SessionContainer
     public static class AssemblyExtension
     {
         /// <summary>
-        /// Get array of assemblies that reference assembly
+        /// Get array of assemblies that reference the assembly, including the assembly
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
         public static IEnumerable<Assembly> GetReferencingAssemblies(this Assembly assembly)
         {
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            yield return assembly;
 
             foreach(var loadedAssembly in loadedAssemblies)
             {
